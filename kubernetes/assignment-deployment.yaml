@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: assignment-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: assignment
+  template:
+    metadata:
+      labels:
+        app: assignment
+    spec:
+      containers:
+        - name: assignment
+          image: soumik1725/assignmentservice
+          ports:
+            - containerPort: 8086
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://studentmanagementdb:3306/studentManagementdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root

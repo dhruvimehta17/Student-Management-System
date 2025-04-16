@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+
+  eureka-server:
+    build: ./eurekaServer
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+    restart: always
+
+  api-gateway:
+    build: ./apiGateway
+    container_name: api-gateway
+    ports:
+      - "9090:9090"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/
+    networks:
+      - app-network
+    restart: always
+
+  student-service:
+    build: ./studentService
+    container_name: student-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/studentdb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    networks:
+      - app-network
+    restart: always
+
+  course-service:
+    build: ./courseService
+    container_name: course-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/coursedb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    networks:
+      - app-network
+    restart: always
+
+  attendance-service:
+    build: ./attendanceService
+    container_name: attendance-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/attendancedb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    networks:
+      - app-network
+    restart: always
+
+  assignment-service:
+    build: ./assignmentService
+    container_name: assignment-service
+    ports:
+      - "8086:8086"
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888/
+      - SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/assignmentdb
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
+    networks:
+      - app-network
+    restart: always
+
+  config-server:
+    build: ./configServer
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_CLOUD_CONFIG_SERVER_GIT_URI=https://github.com/Soumik-tryingtocode/studentDatabaseManagementSystem.git
+    depends_on:
+      - eureka-server
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge

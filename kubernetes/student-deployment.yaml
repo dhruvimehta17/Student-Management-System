@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: student-deployment
+  labels:
+    app: student-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: student-service
+  template:
+    metadata:
+      labels:
+        app: student-service
+    spec:
+      containers:
+        - name: student-container
+          image: soumik1725/studentservice:latest
+          ports:
+            - containerPort: 8081
+          env:
+            - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+              value: "http://eureka-service:8761/eureka"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://mysql:3306/studentManagementdb"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "root"

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attendance-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: attendance
+  template:
+    metadata:
+      labels:
+        app: attendance
+    spec:
+      containers:
+        - name: attendance
+          image: soumik1725/attendanceservice
+          ports:
+            - containerPort: 8085
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://studentmanagementdb:3306/studentManagementdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: root
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: root
